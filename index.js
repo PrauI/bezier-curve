@@ -1,5 +1,4 @@
 
-let beziers;
 let editmode = true;
 let newBezier = false;
 let pointInfo;
@@ -10,16 +9,20 @@ let cnv;
 let collision;
 let editButton;
 let canvas;
+let paths;
 
 function setup(){
     cnv = createCanvas(600,600);
-    beziers = new Array();
+    paths = new Array();
+
+    paths[0] = new Path();
 
     let a = createVector(50,300);
     let b = createVector(600,250);
     let c = createVector(100,100);
     let d = createVector(600,200);
-    beziers[0] = new Bezier(a,b,c,d);
+    let bezier = new Bezier(a,b,c,d);
+    paths[0].beziers.push(bezier);
     canvas = document.getElementById("defaultCanvas0");
     console.log(canvas);
     canvas.addEventListener("click", newPoint);
@@ -36,9 +39,14 @@ function draw(){
 
 
     // drawCubicBezier(beziers[0].path, editmode);
-    for(let i = 0; i < beziers.length; i++){
-        edit(beziers[i].a, beziers[i].b, beziers[i].c, beziers[i].d, i);
-        beziers[i].draw();
+    for(let i = 0; i < paths.length; i++){
+      for(let j = 0; j < paths[i].beziers.length; j++){
+        let bezier = paths[i].beziers[j];
+        edit(bezier.a, bezier.b, bezier.c, bezier.d, j, i);
+        bezier.draw();
+      }
+        // edit(beziers[i].a, beziers[i].b, beziers[i].c, beziers[i].d, i);
+        // beziers[i].draw();
     }
 
 
@@ -52,33 +60,34 @@ function draw(){
 
 
 
-function mouseReleased(){
-    
-}
 
-function edit(a,b,c,d, j){
-    // if mouse is over
+function edit(a,b,c,d, j, i){
+    // if mouse is over and pressed Possition of updatet Point gets stored in pointInfo
+    // j = number of Bezier in Path (class) Array
+    // i = number of Path in paths (variable) Array
+    // n = number of Point (is Necessary to know what kind of point it is)
     let points = [a,b,c,d]
-    for(let i = 0; i < points.length; i++){
-        let point = points[i];
+    for(let n = 0; n < points.length; n++){
+        let point = points[n];
         let mouse = createVector(mouseX, mouseY);
         collision = twoCircleCollision(point, mouse, 10,1);
         if(mouseIsPressed){
             if(collision){
-                pointInfo = [points[i], i, j];
+                pointInfo = [points[n], n, i, j];
             }
         }    
     }
 }
 
 function mouseDragged(){
-    // console.log(dragpoint);
+
     let dragpoint = pointInfo[0];
-    let i = pointInfo[1];
-    let j = pointInfo[2];
+    let n = pointInfo[1];
+    let i = pointInfo[2];
+    let j = pointInfo[3];
 
 
-    if(i == 0 || i == 3){
+    if(n == 0 || n == 3){
         // ancor Point
         dragpoint.x = mouseX;
         dragpoint.y = mouseY;
@@ -88,7 +97,8 @@ function mouseDragged(){
         dragpoint.y = mouseY;
     }
     if(pointInfo){
-        beziers[j].calPoints();
+      let bezier = paths[i].beziers[j];
+      bezier.calPoints();
     }
 }
 
@@ -110,7 +120,7 @@ function newPoint(){
                     let b = createVector((d.x - a.x)* 0.3 + a.x, (d.y - a.y)* 0.3 + a.y);
                     let c = createVector((a.x - d.x)* 0.3 + d.x, (a.y - d.y)* 0.3 + d.y);
                     let bez = new Bezier(a,b,c,d);
-                    beziers.push(bez);
+                    paths[0].beziers.push(bez);
                     newPoints = [null,null];
                     newBezier = false;
                 }
