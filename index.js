@@ -45,8 +45,6 @@ function draw(){
         edit(bezier.a, bezier.b, bezier.c, bezier.d, j, i);
         bezier.draw();
       }
-        // edit(beziers[i].a, beziers[i].b, beziers[i].c, beziers[i].d, i);
-        // beziers[i].draw();
     }
 
 
