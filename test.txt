@@ -1,0 +1,19 @@
+fall 1:
+erster ankerpunkt:
+    folgenden kontrollpunkt mitverschieben
+fall 2: 
+mittlerer ankerpunkt:
+    kontrollpunkt davor und danach mitverschieben
+fall 3:
+letzter ankerpunkt:
+    beide kontrollpunkte mitverschieben
+
+1357
+i%2 == 1
+
+01
+12
+23
+
+01
+23
