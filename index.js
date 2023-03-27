@@ -78,16 +78,26 @@ function mouseDragged() {
   let coPo1 = null;
   let coPo2 = null;
 
-  if (n == 0 || n == 3) {
+  if (n == 0) {
     // ancor Point
     dragpoint.x = mouseX;
     dragpoint.y = mouseY;
-  } else {
+    let bezier = paths[i].beziers[j];
+    let vec = createVector(dragpoint.x - paths[i].beziers[j].a.x, dragpoint.y - paths[i].beziers[j].a.y);
+
+    if(j == 0){
+      let contPo = paths[i].beziers[i].b;
+      contPo.x += vec.x;
+      contPo.y += vec.y;
+      bezier.calPoints();
+    }
+  } else if(n == 3){
+
+  }else {
     dragpoint.x = mouseX;
     dragpoint.y = mouseY;
   }
   if (pointInfo) {
-    let bezier = paths[i].beziers[j];
     bezier.calPoints();
   }
 }
