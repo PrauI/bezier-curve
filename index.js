@@ -39,6 +39,7 @@ function draw() {
     for (let j = 0; j < paths[i].beziers.length; j++) {
       let bezier = paths[i].beziers[j];
       edit(bezier.a, bezier.b, bezier.c, bezier.d, j, i);
+      bezier.calPoints();
       bezier.draw();
     }
   }
@@ -50,24 +51,6 @@ function draw() {
   // console.log(deltaTime);
 }
 
-function edit(a, b, c, d, j, i) {
-  // if mouse is over and pressed Possition of updatet Point gets stored in pointInfo
-  // j = number of Bezier in Path (class) Array
-  // i = number of Path in paths (variable) Array
-  // n = number of Point (is Necessary to know what kind of point it is)
-  let points = [a, b, c, d];
-  for (let n = 0; n < points.length; n++) {
-    let point = points[n];
-    let mouse = createVector(mouseX, mouseY);
-    collision = twoCircleCollision(point, mouse, 10, 1);
-    if (mouseIsPressed) {
-      if (collision) {
-        pointInfo = [points[n], n, i, j];
-      }
-    }
-  }
-
-}
 
 function mouseDragged() {
   let dragpoint = pointInfo[0];
@@ -78,28 +61,107 @@ function mouseDragged() {
   let coPo1 = null;
   let coPo2 = null;
 
-  if (n == 0) {
-    // ancor Point
-    dragpoint.x = mouseX;
-    dragpoint.y = mouseY;
-    let bezier = paths[i].beziers[j];
-    let vec = createVector(dragpoint.x - paths[i].beziers[j].a.x, dragpoint.y - paths[i].beziers[j].a.y);
+  // Erste Bezier
+  if(j == 0){
+    switch (n) {
+      case 0:
+        coPo1 = paths[i].beziers[j].b;
+        coPo2 = null;
+        break;
+      case 1:
+        coPo1 = null;
+        coPo2 = null;
+        break;
+      case 2:
+        if(paths[i].beziers.length > 1){
+          coPo1 = paths[i].beziers[1].b;
+          coPo2 = null;
+        }
+        break;
+      case 3:
+        coPo1 = paths[i].beziers[j].c;
+        if(paths[i].beziers.length > 1){
+          coPo2 = paths[i].beziers[1].b;
+        }else{
+          coPo2 = null;
+        }
+        break;
 
-    if(j == 0){
-      let contPo = paths[i].beziers[i].b;
-      contPo.x += vec.x;
-      contPo.y += vec.y;
-      bezier.calPoints();
+      default:
+        break;
     }
-  } else if(n == 3){
+  }
+  // Letzte Bezier
+  else if(j == paths[i].beziers.length - 1){
+    switch (n) {
+      case 0:
+        coPo1 = paths[i].beziers[j - 1].c;
+        coPo2 = paths[i].beziers[j].b;
+        break;
+      case 1:
+        coPo1 = paths[i].beziers[j - 1].c;
+        coPo2 = null;
+        break;
+      case 2:
+        coPo1 = null;
+        coPo2 = null;
+        break;
+      case 3:
+        coPo1 = paths[i].beziers[j].c;
+        coPo2 = null;
+        break;
+    
+      default:
+        break;
+    }
+  }
+  // Mittlere Beziers
+  else{
+    switch (n) {
+      case 0:
+        coPo1 = paths[i].beziers[j - 1].c;
+        coPo2 = paths[i].beziers[j].b;
+        break;
+      case 1:
+        coPo1 = paths[i].beziers[j - 1].c;
+        coPo2 = null;
+        break;
+      case 2:
+        coPo1 = paths[i].beziers[j + 1].b;
+        coPo2 = null;
+        break;
+      case 3:
+        coPo1 = paths[i].beziers[j].c;
+        coPo2 = paths[i].beziers[1].b;
+        break;
+    
+      default:
+        break;
+    }
+  }
 
-  }else {
-    dragpoint.x = mouseX;
-    dragpoint.y = mouseY;
+  let contPoints = [coPo1, coPo2];
+
+  if(n == 0 || n == 3){
+    for(let i = 0; i < 2; i++){
+      let coPo = contPoints[i];
+      if(coPo){
+        coPo.x -= dragpoint.x - mouseX;
+        coPo.y -= dragpoint.y - mouseY;
+      }
+    }
+  }else{
+    for(let i = 0; i < 2; i++){
+      let coPo = contPoints[i];
+      if(coPo){
+        coPo.x += dragpoint.x - mouseX;
+        coPo.y += dragpoint.y - mouseY;
+      }
+    }
   }
-  if (pointInfo) {
-    bezier.calPoints();
-  }
+
+  dragpoint.x = mouseX;
+  dragpoint.y = mouseY;
 }
 
 function mouseReleased() {
