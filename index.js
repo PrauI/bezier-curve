@@ -9,6 +9,7 @@ let collision;
 let editButton;
 let canvas;
 let paths;
+let test1;
 
 function setup() {
   cnv = createCanvas(600, 600);
